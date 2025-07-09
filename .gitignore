@@ -1,0 +1,16 @@
+/Assets/**
+!/Assets/My/
+!/Assets/My/**
+!/Assets/My.meta
+!/Assets/MyScene.unity
+!/Assets/MyScene.unity.meta
+/Library/**
+/Logs/**
+/obj/**
+/Packages/**
+/.vsconfig
+/Assembly-CSharp.csproj
+/ExperimentCooling.sln
+/Unity.XR.Interaction.Toolkit.Samples.DeviceSimulator.csproj
+/Unity.XR.Interaction.Toolkit.Samples.StarterAssets.csproj
+/Unity.XR.Interaction.Toolkit.Samples.StarterAssets.Editor.csproj
