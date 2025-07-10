@@ -9,6 +9,8 @@
 /obj/**
 /Packages/**
 /.vsconfig
+/.vs
+/Temp
 /Assembly-CSharp.csproj
 /ExperimentCooling.sln
 /Unity.XR.Interaction.Toolkit.Samples.DeviceSimulator.csproj

@@ -4,12 +4,12 @@ using UnityEngine;
 using experiment;
 using System;
 
-public abstract class EndGameEventProvider : MonoBehaviour
+public abstract class SendMessageEventProvider : MonoBehaviour
 {
-    public event Action Action;
-    public void InvokeAction()
+    public event Action<string> Action;
+    public void InvokeAction(string message)
     {
-        if (Action != null) Action.Invoke();
+        if (Action != null) Action.Invoke(message);
     }
 }
 
@@ -18,7 +18,7 @@ public class MyTcpServer : StartEventProvider
     [SerializeField]
     private int port = 51234;
     [SerializeField]
-    private EndGameEventProvider provider;
+    private SendMessageEventProvider provider;
 
     private TcpServer<DecodedData> tcpServer;
     public TcpServer<DecodedData> TcpServer { get { return tcpServer; } }
@@ -38,13 +38,13 @@ public class MyTcpServer : StartEventProvider
     private void OnEnable()
     {
         tcpServer.StartConnection(System.Net.IPAddress.Any, port);
-        provider.Action += OnEndGame;
+        provider.Action += HandleSendMessageEvent;
         
     }
 
     private void OnDisable()
     {   
-        provider.Action -= OnEndGame;
+        provider.Action -= HandleSendMessageEvent;
         tcpServer.CloseConnection();
     }
 
@@ -67,8 +67,8 @@ public class MyTcpServer : StartEventProvider
         }
     }
 
-    private void OnEndGame()
+    private void HandleSendMessageEvent(string message)
     {
-        tcpServer.SendDataAll(new StringData("end"));
+        tcpServer.SendDataAll(new StringData(message));
     }
 }

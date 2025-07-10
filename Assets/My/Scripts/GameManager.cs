@@ -13,7 +13,7 @@ public class StartEventProvider : MonoBehaviour
     }
 }
 
-public class GameManager : EndGameEventProvider
+public class GameManager : SendMessageEventProvider
 {
     [SerializeField]
     private CinemachineDollyCart cart;
@@ -23,6 +23,10 @@ public class GameManager : EndGameEventProvider
     private float cartSpeed;
     [SerializeField]
     private StartEventProvider startEventHandler;
+    [SerializeField]
+    private float high;
+    [SerializeField]
+    private float low;
 
     private int currentLoopCount = 0;
     private bool started = false;
@@ -40,6 +44,14 @@ public class GameManager : EndGameEventProvider
         if (currenPosition < lastPosition)
         {
             OnGoal();
+        }
+        if (lastPosition < high && high < currenPosition)
+        {
+            InvokeAction("high");
+        }
+        if (lastPosition < low && low < currenPosition)
+        {
+            InvokeAction("low");
         }
         lastPosition = currenPosition;
     }
@@ -65,6 +77,7 @@ public class GameManager : EndGameEventProvider
         }
     }
 
+
     public void Reset()
     {
         cart.m_Speed = 0;
@@ -79,7 +92,7 @@ public class GameManager : EndGameEventProvider
     private void OnEndGame()
     {
         Reset();
-        InvokeAction();
+        InvokeAction("end");
         Debug.Log("End game");
     }
 }
