@@ -22,11 +22,13 @@ public class GameManager : SendMessageEventProvider
     [SerializeField]
     private float cartSpeed;
     [SerializeField]
-    private StartEventProvider startEventHandler;
+    private StartEventProvider[] startEventHandlers;
     [SerializeField]
     private float high;
     [SerializeField]
     private float low;
+    [SerializeField]
+    private bool debug = false;
 
     private int currentLoopCount = 0;
     private bool started = false;
@@ -48,10 +50,20 @@ public class GameManager : SendMessageEventProvider
         if (lastPosition < high && high < currenPosition)
         {
             InvokeAction("high");
+            if (debug)
+            {
+                string timeString = DateTime.Now.ToString("HH:mm:ss");
+                Debug.Log($"[{timeString}] Gamemanager:low");
+            }
         }
         if (lastPosition < low && low < currenPosition)
         {
             InvokeAction("low");
+            if (debug)
+            {
+                string timeString = DateTime.Now.ToString("HH:mm:ss");
+                Debug.Log($"[{timeString}] Gamemanager:low");
+            }
         }
         lastPosition = currenPosition;
     }
@@ -60,7 +72,10 @@ public class GameManager : SendMessageEventProvider
     {
         started = true;
         cart.m_Speed = cartSpeed;
-        startEventHandler.Action -= StartGame;
+        foreach (var handler in startEventHandlers)
+        {
+            handler.Action -= StartGame;
+        }
         Debug.Log("Start game");
     }
 
@@ -85,7 +100,10 @@ public class GameManager : SendMessageEventProvider
         currentLoopCount = 0;
         started = false;
 
-        startEventHandler.Action += StartGame;
+        foreach (var handler in startEventHandlers)
+        {
+            handler.Action += StartGame;
+        }
         lastPosition = 0;
     }
 
