@@ -22,13 +22,17 @@ public class GameManager : SendMessageEventProvider
     [SerializeField]
     private float cartSpeed;
     [SerializeField]
-    private StartEventProvider[] startEventHandlers;
+    private StartEventProvider[] startEventProviders;
     [SerializeField]
     private float high;
     [SerializeField]
     private float low;
     [SerializeField]
     private bool debug = false;
+    [SerializeField]
+    private GameObject camera_offset;
+    [SerializeField]
+    private GameObject main_camera;
 
     private int currentLoopCount = 0;
     private bool started = false;
@@ -72,10 +76,12 @@ public class GameManager : SendMessageEventProvider
     {
         started = true;
         cart.m_Speed = cartSpeed;
-        foreach (var handler in startEventHandlers)
+        foreach (var handler in startEventProviders)
         {
             handler.Action -= StartGame;
         }
+        float rot_y = main_camera.transform.localEulerAngles.y;
+        camera_offset.transform.Rotate(0,-1*rot_y,0);
         Debug.Log("Start game");
     }
 
@@ -100,7 +106,7 @@ public class GameManager : SendMessageEventProvider
         currentLoopCount = 0;
         started = false;
 
-        foreach (var handler in startEventHandlers)
+        foreach (var handler in startEventProviders)
         {
             handler.Action += StartGame;
         }
