@@ -82,6 +82,7 @@ public class GameManager : SendMessageEventProvider
         }
         float rot_y = main_camera.transform.localEulerAngles.y;
         camera_offset.transform.Rotate(0,-1*rot_y,0);
+        camera_offset.transform.position -= main_camera.transform.localPosition;
         Debug.Log("Start game");
     }
 
