@@ -19,6 +19,8 @@ public class MyTcpServer : StartEventProvider
     private int port = 51234;
     [SerializeField]
     private SendMessageEventProvider provider;
+    [SerializeField]
+    private GameManager gameManager;
 
     private TcpServer<DecodedData> tcpServer;
     public TcpServer<DecodedData> TcpServer { get { return tcpServer; } }
@@ -62,6 +64,9 @@ public class MyTcpServer : StartEventProvider
                 {
                     tcpServer.SendDataAll(new StringData("started"));
                     InvokeAction();
+                } else if(text == "reset")
+                { 
+                    gameManager.ResetPose();
                 }
             }
         }

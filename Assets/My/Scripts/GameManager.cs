@@ -80,12 +80,18 @@ public class GameManager : SendMessageEventProvider
         {
             handler.Action -= StartGame;
         }
-        float rot_y = main_camera.transform.localEulerAngles.y;
-        camera_offset.transform.localPosition -= main_camera.transform.localPosition;
-        camera_offset.transform.Rotate(0,-1*rot_y,0);
+        ResetPose();
         Debug.Log("Start game");
     }
 
+
+    public void ResetPose()
+    {
+        float rot_y = main_camera.transform.localEulerAngles.y;
+        camera_offset.transform.localPosition = -1*main_camera.transform.localPosition;
+        camera_offset.transform.localRotation = Quaternion.Euler(0, -1 * rot_y, 0);
+
+    }
     public void OnGoal()
     {
         if (started)
