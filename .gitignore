@@ -1,9 +1,7 @@
 /Assets/**
 !/Assets/My/
 !/Assets/My/**
-!/Assets/My.meta
-!/Assets/MyScene.unity
-!/Assets/MyScene.unity.meta
+!/Assets/My*
 /Library/**
 /Logs/**
 /obj/**
