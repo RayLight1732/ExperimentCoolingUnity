@@ -13,116 +13,58 @@ public class StartEventProvider : MonoBehaviour
     }
 }
 
-public class GameManager : SendMessageEventProvider
+public abstract class GameManager : SendMessageEventProvider
 {
-    [SerializeField]
-    private CinemachineDollyCart cart;
-    [SerializeField]
-    private int loopCount;
-    [SerializeField]
-    private float cartSpeed;
+
     [SerializeField]
     private StartEventProvider[] startEventProviders;
     [SerializeField]
-    private float high;
-    [SerializeField]
-    private float low;
-    [SerializeField]
-    private bool debug = false;
+    public bool debug = false;
     [SerializeField]
     private GameObject camera_offset;
     [SerializeField]
     private GameObject main_camera;
 
-    private int currentLoopCount = 0;
     private bool started = false;
-    private float lastPosition = 0;
-    // Start is called before the first frame update
-    void Start()
+    public bool Started
     {
-        Reset();
+        get { return started; }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        float currenPosition = cart.m_Position;
-        if (currenPosition < lastPosition)
-        {
-            OnGoal();
-        }
-        if (lastPosition < high && high < currenPosition)
-        {
-            InvokeAction("high");
-            if (debug)
-            {
-                string timeString = DateTime.Now.ToString("HH:mm:ss");
-                Debug.Log($"[{timeString}] Gamemanager:low");
-            }
-        }
-        if (lastPosition < low && low < currenPosition)
-        {
-            InvokeAction("low");
-            if (debug)
-            {
-                string timeString = DateTime.Now.ToString("HH:mm:ss");
-                Debug.Log($"[{timeString}] Gamemanager:low");
-            }
-        }
-        lastPosition = currenPosition;
-    }
 
-    public void StartGame()
+    private void StartGame()
     {
         started = true;
-        cart.m_Speed = cartSpeed;
         foreach (var handler in startEventProviders)
         {
             handler.Action -= StartGame;
         }
-        ResetPose();
         Debug.Log("Start game");
+        startGame();
     }
+
+    protected abstract void startGame();
 
 
     public void ResetPose()
     {
         float rot_y = main_camera.transform.localEulerAngles.y;
-        camera_offset.transform.localPosition = -1*main_camera.transform.localPosition;
+        camera_offset.transform.localPosition = -1 * main_camera.transform.localPosition;
         camera_offset.transform.localRotation = Quaternion.Euler(0, -1 * rot_y, 0);
 
     }
-    public void OnGoal()
-    {
-        if (started)
-        {
-            currentLoopCount++;
-            Debug.Log("OnGoal" + currentLoopCount + "," + loopCount);
-            if (currentLoopCount == loopCount)
-            {
-                OnEndGame();
-            }
-        }
-    }
 
 
-    public void Reset()
+    protected abstract void onEndGame();
+
+    protected void OnEndGame()
     {
-        cart.m_Speed = 0;
-        cart.m_Position = 0;
-        currentLoopCount = 0;
         started = false;
-
+        onEndGame();
         foreach (var handler in startEventProviders)
         {
             handler.Action += StartGame;
         }
-        lastPosition = 0;
-    }
-
-    private void OnEndGame()
-    {
-        Reset();
         InvokeAction("end");
         Debug.Log("End game");
     }

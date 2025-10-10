@@ -18,6 +18,7 @@ public class StartEvent : StartEventProvider
 
     private void OnEnable()
     {
+        Debug.Log("OnEnable");
         InvokeAction();
     }
 }
