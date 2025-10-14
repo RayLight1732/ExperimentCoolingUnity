@@ -31,6 +31,15 @@ public abstract class GameManager : SendMessageEventProvider
         get { return started; }
     }
 
+    private void Start()
+    {
+        // StartEventProvider ‚ÌƒCƒxƒ“ƒg“o˜^
+        foreach (var handler in startEventProviders)
+        {
+            handler.Action += StartGame;
+        }
+    }
+
 
     private void StartGame()
     {

@@ -11,7 +11,7 @@ public class Ex2Manager : GameManager
     [SerializeField]
     private GameObject target;
     [SerializeField]
-    private float frequency = 2;
+    private float frequency = 0.5f;
     [SerializeField]
     private int count = 5;
     [SerializeField]
@@ -25,8 +25,8 @@ public class Ex2Manager : GameManager
 
     private void update(float time)
     {
-        double amplitude = maxAmplitude * (1 - Math.Abs(time % (2 * amplitudePeriod) - amplitudePeriod) / amplitudePeriod);
-        double pos = amplitude* Math.Sin(2*Math.PI*time*frequency);
+        double amplitude = maxAmplitude * (1 - Math.Abs(time % (amplitudePeriod) - amplitudePeriod/2) / (amplitudePeriod / 2d));
+        amplitude = amplitude* Math.Sin(2*Math.PI*time*frequency);
         target.transform.localPosition = new Vector3((float)amplitude,0,0);
     }
 
@@ -36,9 +36,9 @@ public class Ex2Manager : GameManager
         if (Started)
         {
             time += Time.deltaTime;
-            if (time > count/frequency)
+            if (time > count*amplitudePeriod)
             {
-                time = count/frequency;
+                time = count*amplitudePeriod;
                 update(time);
                 OnEndGame();
             } else
