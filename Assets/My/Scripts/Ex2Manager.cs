@@ -18,7 +18,8 @@ public class Ex2Manager : GameManager
     private float maxAmplitude = 15;
     [SerializeField]
     private float amplitudePeriod = 5;
-
+    [SerializeField]
+    private float threshold = 15*2/5;
 
     float time = 0;
 
@@ -26,8 +27,16 @@ public class Ex2Manager : GameManager
     private void update(float time)
     {
         double amplitude = maxAmplitude * (1 - Math.Abs(time % (amplitudePeriod) - amplitudePeriod/2) / (amplitudePeriod / 2d));
-        amplitude = amplitude* Math.Sin(2*Math.PI*time*frequency);
-        target.transform.localPosition = new Vector3((float)amplitude,0,0);
+        double value = amplitude* Math.Sin(2*Math.PI*time*frequency);
+        if (Math.Abs(amplitude) > threshold)
+        {
+            InvokeAction("high");
+        }
+        else
+        {
+            InvokeAction("low");
+        }
+        target.transform.localPosition = new Vector3((float)value,0,0);
     }
 
     // Update is called once per frame
