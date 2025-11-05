@@ -35,7 +35,8 @@ public class Ex3Manager : GameManager
     private void ProcessRotation(float deltaTime) {
         float angle = rotationAngleSpeed * deltaTime;
         float distance = deltaTime * speed;
-        target.transform.rotation *= Quaternion.Euler(0, angle, rotationRollAngleSpeed*deltaTime);
+        target.transform.Rotate(Vector3.up,angle,Space.World);
+        target.transform.Rotate(Vector3.forward, rotationRollAngleSpeed * deltaTime,Space.Self);
         target.transform.position += target.transform.forward * distance;
     }
 
