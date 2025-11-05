@@ -21,18 +21,22 @@ public class Ex3Manager : GameManager
     private float rotationRollAngleSpeed;
     [SerializeField]
     private int count;
-    private float time;
+    private float stageTime;
     private int stage = 0;// 0:straight 1:curve 2:straight 3: curve
     private int currentCount = 0;
 
+    private Vector3 startPosition;
+
     private void ProcessStraight(float deltaTime)
     {
-        target.transform.localPosition += new Vector3(deltaTime*speed, 0, 0);
+        target.transform.position += target.transform.forward * deltaTime * speed;
     }
 
     private void ProcessRotation(float deltaTime) {
-        target.transform.rotation = Quaternion.Euler(0, rotationAngleSpeed*deltaTime, rotationRollAngleSpeed*deltaTime) * target.transform.rotation;
-        target.transform.localPosition += new Vector3(deltaTime * speed, 0, 0);
+        float angle = rotationAngleSpeed * deltaTime;
+        float distance = deltaTime * speed;
+        target.transform.rotation *= Quaternion.Euler(0, angle, rotationRollAngleSpeed*deltaTime);
+        target.transform.position += target.transform.forward * distance;
     }
 
 
@@ -48,24 +52,25 @@ public class Ex3Manager : GameManager
                     {
                         ProcessStraight(straightTime-time);
                         ProcessRotation(newTime-straightTime);
-                        time = newTime-straightTime;
-                        currentCount ++;
+                        stageTime = newTime-straightTime;
+                        stage ++;
                         InvokeAction("high");
                     } else
                     {
                         ProcessStraight(Time.deltaTime);
-                        time = newTime;
+                        stageTime = newTime;
                     }
                     break;
                 }
             case 1:
             case 3:
                 {
+                    Debug.Log("stage13");
                     float rotationTime = 180f/rotationAngleSpeed;
                     if (newTime >= rotationTime)
                     {
-                        ProcessStraight(rotationTime - time);
-                        stage += 1;
+                        ProcessRotation(rotationTime - time);
+                        stage ++;
                         if (stage == 4)
                         {
                             stage = 0;
@@ -77,13 +82,13 @@ public class Ex3Manager : GameManager
                                 break;
                             }
                         }
-                        ProcessRotation(newTime - rotationTime);
-                        time = newTime - rotationTime;
+                        ProcessStraight(newTime - rotationTime);
+                        stageTime = newTime - rotationTime;
                     }
                     else
                     {
-                        ProcessStraight(Time.deltaTime);
-                        time = newTime;
+                        ProcessRotation(Time.deltaTime);
+                        stageTime = newTime;
                     }
                     break;
                 }
@@ -96,16 +101,10 @@ public class Ex3Manager : GameManager
     {
         if (Started)
         {
-            time += Time.deltaTime;
-            if (time > count * amplitudePeriod)
+            update(stageTime);
+            if (count ==  currentCount)
             {
-                time = count * amplitudePeriod;
-                update(time);
                 OnEndGame();
-            }
-            else
-            {
-                update(time);
             }
         }
     }
@@ -116,13 +115,20 @@ public class Ex3Manager : GameManager
     protected override void startGame()
     {
         ResetPose();
-        time = 0;
-        target.gameObject.transform.localPosition = Vector3.zero;
+        stageTime = 0;
+        currentCount = 0;
+        stage = 0;
+        target.gameObject.transform.localPosition = startPosition;
     }
 
     protected override void onEndGame()
     {
         ResetPose();
-        time = 0;
+        stageTime = 0;
+    }
+
+    protected override void start()
+    {
+        startPosition = target.gameObject.transform.localPosition;
     }
 }

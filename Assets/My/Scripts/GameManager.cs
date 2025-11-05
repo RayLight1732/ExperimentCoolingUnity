@@ -38,6 +38,7 @@ public abstract class GameManager : SendMessageEventProvider
         {
             handler.Action += StartGame;
         }
+        start();
     }
 
 
@@ -48,6 +49,7 @@ public abstract class GameManager : SendMessageEventProvider
         {
             handler.Action -= StartGame;
         }
+        InvokeAction("start");
         Debug.Log("Start game");
         startGame();
     }
@@ -57,6 +59,7 @@ public abstract class GameManager : SendMessageEventProvider
 
     public void ResetPose()
     {
+
         float rot_y = main_camera.transform.localEulerAngles.y;
         camera_offset.transform.localPosition = -1 * main_camera.transform.localPosition;
         camera_offset.transform.localRotation = Quaternion.Euler(0, -1 * rot_y, 0);
@@ -76,5 +79,10 @@ public abstract class GameManager : SendMessageEventProvider
         }
         InvokeAction("end");
         Debug.Log("End game");
+    }
+
+    protected virtual void start()
+    {
+
     }
 }

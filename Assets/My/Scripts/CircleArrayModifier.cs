@@ -71,7 +71,6 @@ public class CircleArrayModifier : MonoBehaviour
             float rad = Mathf.Deg2Rad * i * degree / c;
             obj.transform.localPosition = new Vector3(radius*Mathf.Cos(rad), 0,radius*Mathf.Sin(rad));
             obj.transform.localRotation = Quaternion.Euler(0,-i*degree/c+degreeOffset,0);
-            Debug.Log(rad);
         }
     }
 #endif
