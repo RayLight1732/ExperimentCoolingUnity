@@ -9,6 +9,7 @@ public abstract class SendMessageEventProvider : MonoBehaviour
     public event Action<string> Action;
     public void InvokeAction(string message)
     {
+        Debug.Log("invoke send message:"+message);
         if (Action != null) Action.Invoke(message);
     }
 }
@@ -21,6 +22,8 @@ public class MyTcpServer : StartEventProvider
     private SendMessageEventProvider provider;
     [SerializeField]
     private GameManager gameManager;
+    [SerializeField]
+    private AudioSource notice;
 
     private TcpServer<DecodedData> tcpServer;
     public TcpServer<DecodedData> TcpServer { get { return tcpServer; } }
@@ -67,6 +70,12 @@ public class MyTcpServer : StartEventProvider
                 } else if(text == "reset")
                 { 
                     gameManager.ResetPose();
+                } else if (text == "sound")
+                {
+                    notice.Play();
+                } else if (text == "stop")
+                {
+                    gameManager.StopGame();
                 }
             }
         }

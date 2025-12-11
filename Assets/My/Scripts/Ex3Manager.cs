@@ -21,11 +21,17 @@ public class Ex3Manager : GameManager
     private float rotationRollAngleSpeed;
     [SerializeField]
     private int count;
+    [SerializeField]
+    private AudioSource noise;
+    [SerializeField]
+    private AudioSource notice;
     private float stageTime;
     private int stage = 0;// 0:straight 1:curve 2:straight 3: curve
     private int currentCount = 0;
 
+
     private Vector3 startPosition;
+    private Quaternion startRotation;
 
     private void ProcessStraight(float deltaTime)
     {
@@ -66,18 +72,18 @@ public class Ex3Manager : GameManager
             case 1:
             case 3:
                 {
-                    Debug.Log("stage13");
                     float rotationTime = 180f/rotationAngleSpeed;
                     if (newTime >= rotationTime)
                     {
                         ProcessRotation(rotationTime - time);
                         stage ++;
+                        InvokeAction("low");
                         if (stage == 4)
                         {
                             stage = 0;
                             currentCount++;
-
-                            InvokeAction("low");
+                            InvokeAction("lapend"+currentCount);
+                            notice.Play();
                             if (count == currentCount)
                             {
                                 break;
@@ -119,17 +125,31 @@ public class Ex3Manager : GameManager
         stageTime = 0;
         currentCount = 0;
         stage = 0;
-        target.gameObject.transform.localPosition = startPosition;
+        noise.Play();
     }
 
     protected override void onEndGame()
     {
         ResetPose();
         stageTime = 0;
+        noise.Stop();
     }
 
     protected override void start()
     {
         startPosition = target.gameObject.transform.localPosition;
+        startRotation = target.gameObject.transform.rotation;
+    }
+
+    public override void ResetPose()
+    {
+
+        target.gameObject.transform.position = startPosition;
+        target.gameObject.transform.rotation = startRotation;
+        Matrix4x4 parentMatrix = target.transform.localToWorldMatrix;
+        Matrix4x4 targetLocalMatrix = camera_offset.transform.worldToLocalMatrix * main_camera.transform.localToWorldMatrix;
+        Matrix4x4 newOffsetMatrix = parentMatrix * targetLocalMatrix.inverse;
+        camera_offset.transform.position = newOffsetMatrix.GetColumn(3);
+        camera_offset.transform.rotation = Quaternion.LookRotation(newOffsetMatrix.GetColumn(2),newOffsetMatrix.GetColumn(1));
     }
 }

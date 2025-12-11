@@ -21,9 +21,9 @@ public abstract class GameManager : SendMessageEventProvider
     [SerializeField]
     public bool debug = false;
     [SerializeField]
-    private GameObject camera_offset;
+    protected GameObject camera_offset;
     [SerializeField]
-    private GameObject main_camera;
+    protected GameObject main_camera;
 
     private bool started = false;
     public bool Started
@@ -57,12 +57,12 @@ public abstract class GameManager : SendMessageEventProvider
     protected abstract void startGame();
 
 
-    public void ResetPose()
+    public virtual void ResetPose()
     {
 
-        float rot_y = main_camera.transform.localEulerAngles.y;
         camera_offset.transform.localPosition = -1 * main_camera.transform.localPosition;
-        camera_offset.transform.localRotation = Quaternion.Euler(0, -1 * rot_y, 0);
+        camera_offset.transform.localRotation = Quaternion.Inverse(main_camera.transform.localRotation);
+
 
     }
 
@@ -79,6 +79,11 @@ public abstract class GameManager : SendMessageEventProvider
         }
         InvokeAction("end");
         Debug.Log("End game");
+    }
+
+    public void StopGame()
+    {
+        OnEndGame();
     }
 
     protected virtual void start()
