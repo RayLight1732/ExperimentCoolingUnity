@@ -5,7 +5,6 @@
 /Library/**
 /Logs/**
 /obj/**
-/Packages/**
 /.vsconfig
 /.vs
 /Temp
