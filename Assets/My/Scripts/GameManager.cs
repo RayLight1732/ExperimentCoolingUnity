@@ -23,7 +23,7 @@ public abstract class GameManager : SendMessageEventProvider
     [SerializeField]
     protected GameObject camera_offset;
     [SerializeField]
-    protected GameObject main_camera;
+    protected GameObject head;
 
     private bool started = false;
     public bool Started
@@ -60,8 +60,8 @@ public abstract class GameManager : SendMessageEventProvider
     public virtual void ResetPose()
     {
 
-        camera_offset.transform.localPosition = -1 * main_camera.transform.localPosition;
-        camera_offset.transform.localRotation = Quaternion.Inverse(main_camera.transform.localRotation);
+        camera_offset.transform.localPosition = -1 * head.transform.localPosition;
+        camera_offset.transform.localRotation = Quaternion.Inverse(head.transform.localRotation);
 
 
     }

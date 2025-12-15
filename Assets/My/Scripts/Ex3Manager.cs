@@ -1,10 +1,5 @@
-using Cinemachine;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
+using UnityEngine;
 
 
 public class Ex3Manager : GameManager
@@ -25,27 +20,80 @@ public class Ex3Manager : GameManager
     private AudioSource noise;
     [SerializeField]
     private AudioSource notice;
+    [SerializeField]
+    private Transform rotationPivot;
     private float stageTime;
     private int stage = 0;// 0:straight 1:curve 2:straight 3: curve
     private int currentCount = 0;
+
+    int pitchSign; // +1 or -1
+    int yawSign;
+    int rollSign;
+    int fovSign;
 
 
     private Vector3 startPosition;
     private Quaternion startRotation;
 
+    private bool lastIsRotation = false;
     private void ProcessStraight(float deltaTime)
     {
+        if (lastIsRotation)
+        {
+            lastIsRotation = false;
+            rotationPivot.transform.localRotation = Quaternion.identity;
+        }
         target.transform.position += target.transform.forward * deltaTime * speed;
     }
 
+    private float rotateT;
+
     private void ProcessRotation(float deltaTime) {
-        float angle = rotationAngleSpeed * deltaTime;
+        if (!lastIsRotation)
+        {
+            rotateT = 0;
+            lastIsRotation = true;
+        }
+        rotateT += deltaTime;
+        // 親が進む距離
         float distance = deltaTime * speed;
-        target.transform.Rotate(Vector3.up,angle,Space.World);
-        target.transform.Rotate(Vector3.forward, rotationRollAngleSpeed * deltaTime,Space.Self);
+        // 親のヨー (Y軸)
+        float parentYaw = rotationAngleSpeed * deltaTime;
+        target.transform.Rotate(Vector3.up,parentYaw,Space.World);
         target.transform.position += target.transform.forward * distance;
+
+        //float sway = -0.05f * Mathf.Sin(rotateT * Mathf.PI * 2f / 10f);
+        //Camera.main.transform.localPosition = new Vector3(sway, 0, 0);
+
+        // カメラの回転リセット
+        rotationPivot.transform.localRotation = Quaternion.identity;
+        // ピッチ（X軸）：10秒で3回、±30°
+        float s = pitchSign* Mathf.Sin(rotateT * Mathf.PI * 3f / 10f);
+        float pitch = 30f * s * s * s;
+        rotationPivot.transform.Rotate(Vector3.right, pitch, Space.Self);
+
+        // ヨー（Y軸）：10秒で2回、±40°
+        float s2 = yawSign* Mathf.Sin(rotateT * Mathf.PI * 2f / 10f);
+        float yaw = 40f * s2 * s2 * s2;
+        rotationPivot.transform.Rotate(Vector3.up, -yaw, Space.Self);
+
+        // ロール（Z軸）：10秒で2回、±20°
+        float s3 = rollSign *Mathf.Sin(rotateT * Mathf.PI * 2f / 10f);
+        float roll = 20f * s3 * s3 * s3;
+        rotationPivot.transform.Rotate(Vector3.forward, roll, Space.Self);
+
+        Camera.main.fieldOfView = 60f + fovSign* 20f * Mathf.Sin(rotateT * Mathf.PI*2/10);
     }
 
+    private void updateRotationSign(int phase)
+    {
+        Random.InitState(phase * 7919); // 再現性あり
+
+        pitchSign = Random.value < 0.5f ? 1 : -1;
+        yawSign = Random.value < 0.5f ? 1 : -1;
+        rollSign = Random.value < 0.5f ? 1 : -1;
+        fovSign = Random.value < 0.5f ? 1 : -1;
+    }
 
     private void update(float time)
     {
@@ -57,6 +105,7 @@ public class Ex3Manager : GameManager
                 {
                     if (newTime >= straightTime)
                     {
+                        updateRotationSign(stage+currentCount*2);
                         ProcessStraight(straightTime-time);
                         ProcessRotation(newTime-straightTime);
                         stageTime = newTime-straightTime;
@@ -147,7 +196,7 @@ public class Ex3Manager : GameManager
         target.gameObject.transform.position = startPosition;
         target.gameObject.transform.rotation = startRotation;
         Matrix4x4 parentMatrix = target.transform.localToWorldMatrix;
-        Matrix4x4 targetLocalMatrix = camera_offset.transform.worldToLocalMatrix * main_camera.transform.localToWorldMatrix;
+        Matrix4x4 targetLocalMatrix = camera_offset.transform.worldToLocalMatrix * head.transform.localToWorldMatrix;
         Matrix4x4 newOffsetMatrix = parentMatrix * targetLocalMatrix.inverse;
         camera_offset.transform.position = newOffsetMatrix.GetColumn(3);
         camera_offset.transform.rotation = Quaternion.LookRotation(newOffsetMatrix.GetColumn(2),newOffsetMatrix.GetColumn(1));
