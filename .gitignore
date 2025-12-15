@@ -2,6 +2,10 @@
 !/Assets/My/
 !/Assets/My/**
 !/Assets/My*
+!/Assets/XR/
+!/Assets/XR/**
+!/Assets/XRI/
+!/Assets/XRI/**
 /Library/**
 /Logs/**
 /obj/**
